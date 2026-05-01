@@ -8,9 +8,9 @@
 
 void pulse(gpiod::line_request& req) {
     req.set_value(STEP, gpiod::line::value::ACTIVE);
-    usleep(500);
+    usleep(5000);   // 5 ms HIGH
     req.set_value(STEP, gpiod::line::value::INACTIVE);
-    usleep(500);
+    usleep(5000);   // 5 ms LOW
 }
 
 int main() {
