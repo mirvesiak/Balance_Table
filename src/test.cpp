@@ -2,9 +2,9 @@
 #include <iostream>
 #include <unistd.h>
 
-#define CHIP "gpiochip0"
-#define STEP 17
-#define DIR 27
+#define CHIP "/dev/gpiochip0"
+#define STEP 24
+#define DIR 25
 
 void pulse(gpiod::line_request& req) {
     req.set_value(STEP, gpiod::line::value::ACTIVE);
