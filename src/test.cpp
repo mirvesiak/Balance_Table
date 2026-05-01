@@ -8,9 +8,9 @@
 
 void pulse(gpiod::line_request& req) {
     req.set_value(STEP, gpiod::line::value::ACTIVE);
-    usleep(5000);   // 5 ms HIGH
+    usleep(2000);   // 5 ms HIGH
     req.set_value(STEP, gpiod::line::value::INACTIVE);
-    usleep(5000);   // 5 ms LOW
+    usleep(2000);   // 5 ms LOW
 }
 
 int main() {
@@ -30,7 +30,7 @@ int main() {
     req.set_value(DIR, gpiod::line::value::INACTIVE);
 
     std::cout << "Forward\n";
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 200; i++) {
         pulse(req);
     }
 
@@ -39,7 +39,7 @@ int main() {
     req.set_value(DIR, gpiod::line::value::ACTIVE);
 
     std::cout << "Backward\n";
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 200; i++) {
         pulse(req);
     }
 
