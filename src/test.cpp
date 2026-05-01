@@ -1,43 +1,46 @@
-#include <gpiod.h>
-#include <unistd.h>
+#include <gpiod.hpp>
 #include <iostream>
+#include <unistd.h>
 
 #define CHIP "gpiochip0"
-#define STEP_PIN 17
-#define DIR_PIN 27
+#define STEP_LINE 17
+#define DIR_LINE 27
 
-void pulse(gpiod_line* step, int delay_us) {
-    gpiod_line_set_value(step, 1);
+void pulse(gpiod::line_request& req, int step_offset, int delay_us) {
+    req.set_value(step_offset, 1);
     usleep(delay_us);
-    gpiod_line_set_value(step, 0);
+    req.set_value(step_offset, 0);
     usleep(delay_us);
 }
 
 int main() {
-    gpiod_chip* chip = gpiod_chip_open_by_name(CHIP);
+    gpiod::chip chip(CHIP);
 
-    gpiod_line* step = gpiod_chip_get_line(chip, STEP_PIN);
-    gpiod_line* dir  = gpiod_chip_get_line(chip, DIR_PIN);
+    gpiod::line_request req = chip.prepare_request()
+        .set_consumer("stepper")
+        .add_line_settings(
+            gpiod::line_settings()
+                .set_direction(gpiod::line::direction::OUTPUT),
+            {STEP_LINE, DIR_LINE}
+        )
+        .do_request();
 
-    gpiod_line_request_output(step, "stepper", 0);
-    gpiod_line_request_output(dir, "stepper", 0);
-
-    gpiod_line_set_value(dir, 0);
+    // DIR = 0
+    req.set_value(DIR_LINE, 0);
 
     std::cout << "Forward\n";
     for (int i = 0; i < 2000; i++) {
-        pulse(step, 500);
+        pulse(req, STEP_LINE, 500);
     }
 
     sleep(1);
 
-    gpiod_line_set_value(dir, 1);
+    req.set_value(DIR_LINE, 1);
 
     std::cout << "Backward\n";
     for (int i = 0; i < 2000; i++) {
-        pulse(step, 500);
+        pulse(req, STEP_LINE, 500);
     }
 
-    gpiod_chip_close(chip);
     return 0;
 }
